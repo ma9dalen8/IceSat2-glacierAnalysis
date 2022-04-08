@@ -2,11 +2,10 @@
 #
 # Author: Magdalena Fischer
 # Email: magdalena.fischer@stud-mail.uni-wuerzburg.de
-# date: 01.04.2022
+# date: 10.04.2022
+# GitHub: https://github.com/ma9dalen8/IceSat2-glacierAnalysis
 #
-# this script can be used to convert iceSat2 hdf5 data, downloaded from the
-# ndsci.org/data/atl06 website, to gpgk. All datapoints will be stored in a
-# single file.
+# In this script all functions for processing the IceSat-2 data are included.
 #
 # Libraries used:
 #
@@ -17,22 +16,20 @@
 # library(raster)
 #
 #-------------------------------------------------------------------------------
-library(rhdf5)
-library(rgdal)
-library(sf)
-library(sp)
-library(raster)
-library(rgeos)
-library(ggplot2)
-library(gstat)
-library(tidyverse)
 
 
+
+
+#' restructure files and folders
+#'
+#' @param inpath directory where subfolders holding IceSat-2 hdf5 files are stored
+#'
 
 copyFiles <- function(inpath){
 
   folders <- list.files(path=dir, full.names = TRUE)
   print(folders)
+  # loop through all folders copying all .h5 files to directory above
   for (folder in folders){
     fileH5 <- list.files(path=folder, pattern='*.h5')
     fullpath <- str_replace_all(paste(folder,'/',fileH5), fixed(" "), "")
@@ -135,6 +132,15 @@ hdf5togpkg <- function(paths, outpath){
 
 
 
+#' intersection area of interest with IceSat-2 points
+#'
+#' @param aoi gpkg with polygon of area of interes
+#' @param allDatapoints gpkg all IceSat-2 points
+#' @param outpath path where to save result
+#'
+#' @return data.frame with points within the area of interest
+#'
+
 intersectPoints <- function(aoi, allDatapoints, outpath){
 
   # assign crs
@@ -152,33 +158,61 @@ intersectPoints <- function(aoi, allDatapoints, outpath){
 }
 
 
+
+
+
+#' aggregating and projecting historic DEM
+#'
+#' @param histDEM Formal class RasterLayer
+#'
+#' @return RasterLayer with projection (WGS84)
+#'
+
+preprocesshistDEM <- function(histDEM){
+
+
+  histDEMagg <- aggregate(histDEM, fact=10)
+  spDEM <- projectRaster(histDEMagg, crs = "+init=epsg:4326")
+
+  return(spDEM)
+
+}
+
+
+
+
+
 #' createDEM
 #'
 #' @param seasonaldata gpkg of iceSat2 points, including height, lat, lon
+#' @param  spDEM historic DEM with projection
 #'
 #' @return list with lat, lon, var1.pred values as result of the interpolation
 
 
-createDEM <- function(seasonaldata, spRaster){
+createDEM <- function(seasonaldata, spDEM){
 
-  # converting DF to large spatial PointsDataframe and assining a projection (UTM28N)
+
+  # create grid same extent as historic DEM
+  grid = as(spDEM, "SpatialPixels")
+
+  # converting DF to large spatial PointsDataframe and assining the same projection as grid (WGS84)
+  seasonaldata <- seasonaldata %>%
+    mutate(lat= unlist(map(seasonaldata[]$geom, 1)),
+           lon= unlist(map(seasonaldata[]$geom, 2)))
+
+
   spatialdf <- data.frame(seasonaldata)
   coordinates(spatialdf) <- ~lat+lon
-  proj4string(spatialdf) <-  CRS("+init=epsg:32633 ")
+  proj4string(spatialdf) <- crs(spDEM)
 
-
-
-  grid = as(spRaster, "SpatialPixels")
-  proj4string(grid) <-  CRS("+init=epsg:32633 ")
-
-  # creating a raster based on the point dataset
-  #df <- SpatialPoints(griddf, proj4string = spatialdf@proj4string)
 
   # interpolate height of spatial points from spatialdf and writing predicted values to the grid
   interpolate <-  idw(formula = dem_h~1, locations=spatialdf, newdata = grid)
 
   # creating grid from interpolated values
   dem <- data.frame(interpolate)
+
 
 
   return (dem)
@@ -190,78 +224,24 @@ createDEM <- function(seasonaldata, spRaster){
 
 #' diffDEMs
 #'
-#' @param dem1 list with lat, lon, var1.pred values, result of createDEM, first timestep
-#' @param dem2 list with lat, lon, var1.pred values, result of createDEM, later timestep
+#' @param dem1 Formal class RasterLayer, historic DEM with projection
+#' @param dem2 list with lat, lon, var1.pred values, more recent DEM, result of createDEM
+#' @param years integer years between the two DEMs
 #'
-#' @return list with with the difference between the two DEMs
+#' @return list with with  lat, lon and the difference between the two DEMs per year
 
-diffDEMs <- function(dem1, dem2){
+diffDEMs <- function(dem1, dem2, years){
+
+  dem1 <-  as.data.frame(spDEM, xy=TRUE)
+  dem1 <- na.omit(dem1)
+  colnames(dem1) <- c('lat', 'lon', 'elevation' )
 
   #calculating difference of two timestemps
-  elevationDiff <- data.frame(dem1$x, dem1$y, (dem1$GlacierDEMJanMayen-dem2$var1.pred)/72)
-  colnames(elevationDiff) <- c('lat', 'lon', 'change/year')
+  elevationDiff <- data.frame(dem1$lat, dem1$lon, (dem1$elevation-dem2$var1.pred)/years)
+  colnames(elevationDiff) <- c('lat', 'lon', 'changeYear')
+
+
 
   return (elevationDiff)
 }
-
-#-------------------------------------------------------------------------------
-#
-# EXECUTE FUNCTIONS
-#
-#-------------------------------------------------------------------------------
-
-
-dir <- "C:/Users/Magdalena/Eagle/MB2/FinalProject/JanMayen2021/more"
-copyFiles(dir)
-
-
-
-paths <-  list.files(path='C:/Users/Magdalena/Eagle/MB2/FinalProject/JanMayen2021/more', pattern='*.h5', full.names = TRUE)
-outpath_hdf5togpkg <- 'C:/Users/Magdalena/Eagle/MB2/FinalProject/allPointsJanMayen.gpkg'
-
-hdf5togpkg(paths, outpath_hdf5togpkg)
-
-
-
-aoi <- st_read('../outlineJanMayen.gpkg')
-allDatapoints <- st_read(outpath_hdf5togpkg)
-outpath_intersectPoints <- '../aoipointsJanMayen2021.gpkg'
-
-intersectPoints(aoi, allDatapoints, outpath_intersectPoints)
-
-
-histDEM <- raster('../GlacierDEMJanMayen.tif')
-histDEM <- aggregate(histDEM, fact=10)
-spRaster <- projectRaster(histDEM, crs = "+init=epsg:4326")
-
-
-aoiData <- st_read(outpath_intersectPoints)
-aoiDataLatLon <- aoiData %>%
-  mutate(lat= unlist(map(aoiData$geom, 1)),
-         lon= unlist(map(aoiData$geom, 2)))
-
-
-dem1 <- createDEM(aoiDataLatLon, spRaster) #2019
-dem2 <- createDEM(aoiDataLatLon) #2021
-
-
-ggplot()+
-  geom_tile(data = dem1, aes(x = x, y = y, fill = var1.pred))+
-  scale_fill_gradientn(colors = terrain.colors(10))+
-  geom_sf(data=aoiData, colour='black', fill=NA, alpha=50)+
-  theme_bw()
-
-# Step 4: calculating the difference between two elevation models to evaluate the change
-# needs two DEMs from different times
-# plot difference
-
-rasterDF <-  as.data.frame(spRaster, xy=TRUE)
-plot(rasterDF$GlacierDEMJanMayen)
-eleDiff <- diffDEMs(rasterDF, dem1)
-
-ggplot()+
-  geom_tile(data=eleDiff, aes(x=lat, y=lon, fill = diff), colour ='white')+
-  scale_fill_gradient2('diff', low='darkred', mid='azure2', high='darkblue')+
-  geom_sf(data=aoi, colour='black', fill=NA)+
-  theme_bw()
 

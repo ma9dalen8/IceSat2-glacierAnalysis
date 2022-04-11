@@ -25,7 +25,7 @@ https://www.glims.org/RGI/<br/><br/>
 
 
  ## Research
- This Repository contains three scripts, one main script to execute the function, 
+ This Repository contains three scripts, one main script to execute the functions, 
  one processing script with all the functions and a plotting script where the results are visulized.
  Generally the changes in the glacier elevation are researched and therefore gathering information
  about ice thickening or thinning are the focus. The analysis is done considering IceSat-2
@@ -45,7 +45,7 @@ https://www.glims.org/RGI/<br/><br/>
 (7) plotting some results<br/><br/>
 
 ## Execution
-This Repository includes an example Dataset for Jan Mayen, with all IceSat-2 data from the last summer season, a historic DEM and a gpkg file eith the extends 
+This Repository includes an example Dataset for Jan Mayen, with all IceSat-2 data from the summer season 2021 (hdf5-format), a historic DEM (tif-format) and a gpkg file with the extends 
 of the glacier. After cloning the repository, some variables need to be set. If the example data is used the paths don't need to be changed. After executing all 
 the functions step by step from the executing.R script, the elevation changes can be investigated in different plots. <br/>*NOTICE*: the intersectPoints function 
-needs a long time for calculating. To skip this process an already cropped dataset is provided in the Data folder and can be used instead.
+needs a long time for extracting the relevant points. To skip this process an already cropped dataset is provided in the Data folder and can be used instead.

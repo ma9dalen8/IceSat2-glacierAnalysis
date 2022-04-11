@@ -2,11 +2,22 @@
 #
 # Author: Magdalena Fischer
 # Email: magdalena.fischer@stud-mail.uni-wuerzburg.de
-# date: 10.04.2022
 # GitHub: https://github.com/ma9dalen8/IceSat2-glacierAnalysis
+# Date: 10.04.2022
 #
-# this script is the main script to execute the workflow to analyse glaciers
-# with IceSat-2 data. Considering the following steps:
+#
+# This script is the main script to execute the workflow to analyse glaciers,
+# mainly changes in the glacier elevation and therefore gathering information
+# about ice thickening or thinning. The analysis is done considering IceSat-2
+# data as well as an historic DEM from NPI. As area of interest the
+# Randolpgh Glacier Inventory was considered.
+#
+# Data used:
+# https://data.npolar.no/home/
+# https://nsidc.org/data/atl06
+# https://www.glims.org/RGI/
+#
+# The process considers the following steps:
 #
 # (1) restructure downloaded IceSat-2 files into one folder
 # (2) converting single .hdf5 files to one .gpkg file
@@ -15,23 +26,24 @@
 # (5) calculating the elevation change per year between historic DEM and newly calculated DEM
 # (6) plotting some results
 #
+# Technical information:
+# R-version: 4.1.1
+# operating system: windows
+# libraries: listed below
+# scripts needed: processing.R, plotting.R
 #
 #-------------------------------------------------------------------------------
 
-library(rgdal) #
-library(sf) #
-library(raster) #
-library(ggplot2) #
-library(gstat) #
-library(tidyverse) #
-library(rhdf5) #
-library(stringr) #
+library(ggplot2)
+library(ggpubr)
+library(gstat)
+library(raster)
+library(rgdal)
+library(rhdf5)
+library(sf)
+library(stringr)
+library(tidyverse)
 
-library(rgeos)
-library(sp)
-library(viridisLite)
-library(maptools)
-library(rayshader)
 
 source('RScripts/processing.R')
 source('RScripts/plotting.R')
@@ -123,7 +135,3 @@ pointsDiffPLT
 # elevation difference points on hillshade of glacier
 pntsOnGlacierPLT <- pointsDiffGlacier (histDEM, combinedpointData)
 pntsOnGlacierPLT
-
-
-
-

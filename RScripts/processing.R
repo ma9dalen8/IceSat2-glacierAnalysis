@@ -2,11 +2,14 @@
 #
 # Author: Magdalena Fischer
 # Email: magdalena.fischer@stud-mail.uni-wuerzburg.de
-# date: 10.04.2022
 # GitHub: https://github.com/ma9dalen8/IceSat2-glacierAnalysis
+# Date: 10.04.2022
+#
 #
 # In this script all functions for processing the IceSat-2 data are included.
 #
+# R-version: 4.1.1
+# operating system: windows
 # Libraries used:
 #
 # library(gstat)
@@ -18,8 +21,6 @@
 # library(tidyverse)
 #
 #-------------------------------------------------------------------------------
-
-
 
 
 #' restructure files and folders
@@ -132,8 +133,6 @@ hdf5togpkg <- function(paths, outpath){
 }
 
 
-
-
 #' intersection area of interest with IceSat-2 points
 #'
 #' @param aoi gpkg with polygon of area of interes
@@ -160,9 +159,6 @@ intersectPoints <- function(aoi, allDatapoints, outpath){
 }
 
 
-
-
-
 #' aggregating and projecting historic DEM
 #'
 #' @param histDEM Formal class RasterLayer
@@ -181,16 +177,13 @@ preprocesshistDEM <- function(histDEM){
 }
 
 
-
-
-
 #' createDEM
 #'
 #' @param seasonaldata gpkg of iceSat2 points, including height, lat, lon
 #' @param  spDEM historic DEM with projection
 #'
 #' @return list with lat, lon, var1.pred values as result of the interpolation
-
+#'
 
 createDEM <- function(seasonaldata, spDEM){
 
@@ -221,9 +214,6 @@ createDEM <- function(seasonaldata, spDEM){
 }
 
 
-
-
-
 #' diffDEMs
 #'
 #' @param dem1 Formal class RasterLayer, historic DEM with projection
@@ -231,6 +221,7 @@ createDEM <- function(seasonaldata, spDEM){
 #' @param years integer years between the two DEMs
 #'
 #' @return list with with  lat, lon and the difference between the two DEMs per year
+#'
 
 diffDEMs <- function(dem1, dem2, years){
 

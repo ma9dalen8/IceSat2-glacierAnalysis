@@ -148,6 +148,7 @@ intersectPoints <- function(aoi, allDatapoints, outpath){
   st_crs(allDatapoints) = 4326
   aoi <- st_transform(aoi, crs = 4326)
 
+  print('intersecting points may take a while, example result data set provided on GitHub')
   # intersect of polygon and iceSat2 points
   aoiDatapoints <- st_intersection(aoi, allDatapoints)
 
@@ -181,6 +182,8 @@ preprocesshistDEM <- function(histDEM){
 #'
 #' @param seasonaldata gpkg of iceSat2 points, including height, lat, lon
 #' @param  spDEM historic DEM with projection
+#'
+#' @source https://www.youtube.com/watch?v=93_JSqQ3aG4
 #'
 #' @return list with lat, lon, var1.pred values as result of the interpolation
 #'

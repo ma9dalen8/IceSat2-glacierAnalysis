@@ -99,7 +99,7 @@ intersectPoints(aoi, allDatapoints, outpath_intersectPoints)
 
 
 histDEM <- raster('Data/GlacierDEMJanMayen.tif')
-aoiData <- st_read('aoiPointsJanMayen.gpkg')
+aoiData <- st_read(outpath_intersectPoints) # example Dataset ('Data/aoiPointsJanMayen.gpkg')
 
 spDEM <- preprocesshistDEM(histDEM)
 newDEMdf <- createDEM(aoiData, spDEM)

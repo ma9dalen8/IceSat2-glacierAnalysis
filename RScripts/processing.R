@@ -9,11 +9,13 @@
 #
 # Libraries used:
 #
-# library(rhdf5)
-# library(rgdal)
-# library(sf)
-# library(sp)
+# library(gstat)
 # library(raster)
+# library(rgdal)
+# library(rhdf5)
+# library(sf)
+# library(stringr)
+# library(tidyverse)
 #
 #-------------------------------------------------------------------------------
 
@@ -245,3 +247,28 @@ diffDEMs <- function(dem1, dem2, years){
   return (elevationDiff)
 }
 
+
+
+#' extracting elevation points from hist DEM accordingly to the IceSat-2 points
+#'
+#' @param aoiData data.frame with all IceSat-2 points over the glacier
+#' @param spDEM Raster layer of the historic DEM
+#' @param years amount of years between the two elevation datasets
+#'
+#' @return data.frame with historic and recent elevation information as well as elevation difference
+#'
+
+extractPointsDEM <- function(aoiData, spDEM, years){#
+
+  aoiDataLatLon <- aoiData %>%
+    mutate(lat= unlist(map(aoiData[]$geom, 1)),
+           lon= unlist(map(aoiData[]$geom, 2)))
+
+
+  rasValue <- raster::extract(spDEM, aoiData)
+  eleChange <- (aoiData$dem_h-rasValue)/years
+  combinedData <- cbind(aoiDataLatLon, rasValue, eleChange)
+
+  return(combinedData)
+
+}

@@ -94,72 +94,35 @@ newDEMdf <- createDEM(aoiData, spDEM)
 eleDiff <- diffDEMs(spDEM, newDEMdf, years)
 
 
+combinedpointData <- extractPointsDEM(aoiData, spDEM, years)
 
 
 
-ggplot()+
-  geom_tile(data = newDEMdf, aes(x = x, y = y, fill = var1.pred))+
-  scale_fill_gradientn(colors = terrain.colors(10))+
-  geom_sf(data=aoiData, colour='black', size = 0.5, shape= 1, alpha=0.3)+
-  theme_bw()
-
-
-
-
-ggplot()+
-  geom_tile(data=eleDiff, aes(x=lat, y=lon, fill = changeYear), colour ='white')+
-  scale_fill_gradient2('diff', low='darkred', mid='azure2', high='darkblue')+
-  theme_bw()
-
+#-------------------------------------------------------------------------------
 #
+# CREATE PLOTS
+#
+#-------------------------------------------------------------------------------
 
+# the two DEMs next to each other
+demPLT <- rasterplot (spDEM, newDEMdf)
+demPLT
 
+# raster showing elevation difference per year per pixel
+elevDiffPLT <- diff2raster (eleDiff)
+elevDiffPLT
 
+# scatter plot with elevation points from 1949 and 2021
+pointsPLT <- elevPoints (combinedpointData)
+pointsPLT
 
+# scatter plot with elevation difference points and trend lines
+pointsDiffPLT <- elevPointsDiff (combinedpointData)
+pointsDiffPLT
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ggplot()+
-#   geom_tile(data = newDEMdf, aes(x = x, y = y, fill = var1.pred))+
-#   scale_fill_gradientn(colors = terrain.colors(10))+
-#   geom_sf(data=aoiData, colour='black', fill=NA, alpha=50)+
-#   theme_bw()
-
-# Step 4: calculating the difference between two elevation models to evaluate the change
-# needs two DEMs from different times
-# plot difference
-# ggplot()+
-#   geom_tile(data=eleDiff, aes(x=lat, y=lon, fill = diff), colour ='white')+
-#   scale_fill_gradient2('diff', low='darkred', mid='azure2', high='darkblue')+
-#   geom_sf(data=aoi, colour='black', fill=NA)+
-#   theme_bw()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# elevation difference points on hillshade of glacier
+pntsOnGlacierPLT <- pointsDiffGlacier (histDEM, combinedpointData)
+pntsOnGlacierPLT
 
 
 

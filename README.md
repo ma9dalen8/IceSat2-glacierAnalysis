@@ -45,7 +45,6 @@ https://www.glims.org/RGI/<br/><br/>
 (7) plotting some results<br/><br/>
 
 ## Execution
-This Repository includes an example Dataset for Jan Mayen, with all IceSat-2 data from the summer season 2021 (hdf5-format), a historic DEM (tif-format) and a gpkg file with the extends 
-of the glacier. After cloning the repository, some variables need to be set. If the example data is used the paths don't need to be changed. After executing all 
-the functions step by step from the executing.R script, the elevation changes can be investigated in different plots. <br/>*NOTICE*: the intersectPoints function 
-needs a long time for extracting the relevant points. To skip this process an already cropped dataset is provided in the Data folder and can be used instead.
+This Repository includes the three scripts and an example Dataset for Jan Mayen, with all IceSat-2 data from the summer season 2021 (hdf5-format), a historic DEM (tif-format) and a gpkg file with the extends 
+of the glacier. After cloning the repository, make sure that the connection between the executing.R and the processing.R and plotting.R scripts is correctly established on top of the executing.R script. Also some variables in the executing.R script need to be set. If the example data is used no change is needed. Afterterwards the executing.R script can be executed step by step. AFter porcessing the data, the elevation changes can be investigated in different plots. 
+<br/>*NOTICE*: the intersectPoints function needs a long time for extracting the relevant points. To skip this process an already cropped dataset is provided in the Data folder and can be used instead.

@@ -41,7 +41,7 @@ https://www.glims.org/RGI/<br/><br/>
 (3) intersecting all points with area of interest<br/>
 (4) interpolating aoiPoints to raster DEM<br/>
 (5) calculating the elevation change per year between historic DEM and newly calculated DEM<br/>
-(6) extractig teh saem points as IceSat-2 from historic DEM <br/>
+(6) extractig the same points as IceSat-2 from historic DEM <br/>
 (7) plotting some results<br/><br/>
 
 ## Execution

@@ -68,9 +68,9 @@ diff2raster <- function(eleDiff){
 
   plt <- ggplot()+
     geom_tile(data=eleDiff, aes(x=lat, y=lon, fill = changeYear), colour ='white')+
-    scale_fill_gradient2('elevation difference (m)', low='darkred', mid='azure2', high='darkblue')+
+    scale_fill_gradient2('elevation difference(m) / year', low='darkred', mid='azure2', high='darkblue')+
     theme_bw()+
-    labs(title = "Elevation changes between 1949 and 2021 on Jan Mayen",
+    labs(title = "Yearly elevation changes between 1949 and 2021 on Jan Mayen",
          x = "latitude", y = "longitude")+
     theme(legend.position = "bottom", legend.direction = "horizontal")+
     guides(fill = guide_colourbar(title.position = "top", barwidth = 20, barheight = 0.5))
